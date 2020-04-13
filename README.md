@@ -16,7 +16,7 @@
 ### Dashboard
 This is used as the ETL for a [Power BI COVID-19 visualization](https://app.powerbi.com/view?r=eyJrIjoiN2M3NmI3MDctMjgyNS00OGRkLWJjMWItZTkyYTJmYTJhMDgzIiwidCI6IjVkZmY2MmYyLWEyN2YtNDdhYi05YTI2LTJkNjkwOWNmOWVlZSJ9).
 
-![](media\power_bi_covid-19.png)
+![](https://github.com/tspanos/COVID-19/raw/master/media/power_bi_covid-19.png)
 
 ### Usage
 - Clone or download this repo. Python 3.7+ is required to use.
