@@ -25,9 +25,6 @@ CONVERT_PROVINCE_TO_COUNTRY = ['Hong Kong', 'Faroe Islands', 'Greenland', 'Frenc
                                'Bonaire, Sint Eustatius and Saba', 'Bermuda', 'Cayman Islands', 'Channel Islands',
                                'Gibraltar', 'Isle of Man', 'Montserrat', 'Anguilla', 'British Virgin Islands',
                                'Turks and Caicos Islands', 'Falkland Islands (Malvinas)']
-DROP_COUNTRIES = ['Diamond Princess', 'MS Zaandam', 'Bonaire, Sint Eustatius and Saba', 'Western Sahara',
-                  'Channel Islands', 'Gibraltar', 'Saint Barthelemy', 'Saint Pierre and Miquelon', 'Sint Maarten',
-                  'St Martin', 'Turks and Caicos Islands', 'Holy See']
 COUNTRIES_TO_RENAME = {'Taiwan*': 'Taiwan', 'West Bank and Gaza': 'Palestine', 'Korea, South': 'South Korea'}
 
 
@@ -68,12 +65,17 @@ def generate_global_dataset(output_path: str) -> None:
                                   GLOBAL_RECOVERED_CSV_URL)
     # Rename Country Colummn
     global_cases = global_cases.rename(columns=KEEP_AND_RENAME_COLUMNS)
-    # Drop some Countries
-    global_cases = global_cases[~global_cases['Country'].isin(DROP_COUNTRIES)]
     # Adjust Country Names
     global_cases['Country'] = global_cases['Country'].replace(COUNTRIES_TO_RENAME)
     # Bring in country data
     country_data = pd.read_excel('data/Country Data.xlsx', sheet_name='Countries')
+    # Drop Countries not in Country Data
+    not_in_country_data = pd.merge(left=global_cases, right=country_data, how="outer", indicator=True)
+    not_in_country_data = not_in_country_data[not_in_country_data['_merge'] == 'left_only']
+    global_cases = global_cases[~global_cases['Country'].isin(not_in_country_data['Country'])]
+    print(f"The following countries were dropped as additional population level data could not be found.\r\n "
+          f"{not_in_country_data['Country'].unique()}")
+    # Make additional columns that require country data
     global_cases = pd.merge(left=global_cases, right=country_data)
     global_cases['Growth Rate'] = (
             global_cases['Confirmed'] / (global_cases['Confirmed to Date'] - global_cases['Confirmed'])).replace(
