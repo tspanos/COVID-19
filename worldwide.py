@@ -70,8 +70,9 @@ def generate_global_dataset(output_path: str) -> None:
     # Bring in country data
     country_data = pd.read_excel('data/Country Data.xlsx', sheet_name='Countries')
     # Drop Countries not in Country Data
-    not_in_country_data = pd.merge(left=global_cases, right=country_data, how="outer", indicator=True)
-    not_in_country_data = not_in_country_data[not_in_country_data['_merge'] == 'left_only']
+    # global_cases[global_cases['Country'].isin(country_data['Country'])]
+    in_country_data = pd.merge(left=global_cases, right=country_data, how="outer", indicator=True)
+    not_in_country_data = in_country_data[in_country_data['_merge'] == 'left_only']
     global_cases = global_cases[~global_cases['Country'].isin(not_in_country_data['Country'])]
     print(f"The following countries were dropped as additional population level data could not be found.\r\n "
           f"{not_in_country_data['Country'].unique()}")
